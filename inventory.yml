@@ -1,0 +1,38 @@
+all:
+  children:
+    CVP_SERVERS:
+      hosts:
+        cvp:
+          ansible_host: 192.168.1.248
+    HOME_LAB:
+      children:
+        LAB_NETWORK:
+          children:
+            NODES:
+              hosts:
+                veos1:
+                  ansible_host: 192.168.1.180
+                veos2:
+                  ansible_host: 192.168.1.181
+                veos3:
+                  ansible_host: 192.168.1.182
+                veos4:
+                  ansible_host: 192.168.1.183
+                veos5:
+                  ansible_host: 192.168.1.184
+                veos6:
+                  ansible_host: 192.168.1.185
+                veos7:
+                  ansible_host: 192.168.1.186
+                veos8:
+                  ansible_host: 192.168.1.187
+                veos9:
+                  ansible_host: 192.168.1.188
+                veos10:
+                  ansible_host: 192.168.1.189
+            TEST_NODES:
+              hosts:
+                LAB_SW1:
+                  ansible_host: 192.168.1.244
+                LAB_SW2:
+                  ansible_host: 192.168.1.245

@@ -1,0 +1,13 @@
+---
+
+- name: Parse Host & Group Variables
+  connection: local
+  gather_facts: no
+  hosts: NODES
+#
+  tasks:
+
+  - name: Display Hosts
+    debug:
+      #msg: "System {{ hostname }} uses {{ interfaces['Ethernet1']['ip_address'] }}"
+      msg: "System {{ hostname }} uses {{ interfaces.Ethernet1.ip_address }} and ASN {{ bgp_asn }}"

@@ -1,0 +1,39 @@
+---
+- name: Update Configlets
+  hosts: cvp
+  connection: local
+  gather_facts: no
+
+  collections:
+    - arista.cvp
+    - arista.avd
+
+# Device Inventory dictionary is stored in host_vars/cvp/devices_inventory.yml
+
+  tasks:
+
+    - name: "Collecting facts from CVP {{ inventory_hostname }}"
+      tags: [ always ]
+      cv_facts:
+      register: cvp_facts
+
+    # Upload configlets from a directory
+    - name: "Upload configlets to CVP {{ inventory_hostname }}"
+      tags: [ update ]
+      import_role:
+          name: arista.avd.cvp_configlet_upload
+      vars:
+        configlet_directory: 'cvp_configlets'
+        file_extension: 'txt'
+        configlets_cvp_prefix: 'DC1'
+
+    - name: "Attaching configlets to devices on CVP {{ inventory_hostname }}"
+      tags: [ provision ]
+      cv_device:
+        devices: "{{ devices_inventory }}"
+        cvp_facts: "{{ cvp_facts.ansible_facts }}"
+        configlet_mode: merge
+        # device_filter: ['veos']
+      register: cvp_device
+
+

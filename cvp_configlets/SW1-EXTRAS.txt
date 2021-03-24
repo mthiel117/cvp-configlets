@@ -1,0 +1,163 @@
+daemon TerminAttr
+   exec /usr/bin/TerminAttr -ingestgrpcurl=192.168.1.248:9910 -cvcompression=gzip -ingestauth=key,magickey -smashexcludes=ale,flexCounter,hardware,kni,pulse,strata -ingestexclude=/Sysdb/cell/1/agent,/Sysdb/cell/2/agent -ingestvrf=MGMT -taillogs
+   no shutdown
+!
+ip name-server vrf MGMT 192.168.1.246
+ntp server vrf MGMT 192.168.1.246 iburst maxpoll 3
+ntp server vrf MGMT time.google.com iburst maxpoll 3
+radius-server host 192.168.1.205 key 7 070E33455D1D18544541
+!
+aaa group server radius RADIUS-SVRS
+   server 192.168.1.205
+!
+aaa authentication login default group RADIUS-SVRS local
+aaa authorization exec default group RADIUS-SVRS local
+!
+username admin privilege 15 role network-admin secret sha512 $6$VjNhzmCAxU1sUoTD$MLREvtwRBkraoOII322Yo5NTXSrSRpzsAFcq2JcW5GZOtQF4M3hpJZS1DeO0o/zuvY66JffJD0isnW0Tj6fxH/
+username cvpadmin privilege 15 secret sha512 $6$PpXEtQeyPZGN34LR$hZ8n2FOw/6qBLFZPXJunTDwOVN9NIsLmNTlVe7d4QZq82G3iDYxmFoM5umGDqlLZQQTebCQWBrHFbse8fFmse1
+username mthiel privilege 15 role network-admin secret sha512 $6$fdQaIpF/f.I0pmqA$C5na312PZeppMAhigaIyyInm8FNdomUCABC.52b9QiLL1eR2QUWFyiyC8J/NVPqVgLV6ljPSIg6qW60paBY4D0
+!
+clock timezone EST5EDT
+!
+management api http-commands
+   no shutdown
+   vrf MGMT
+      no shutdown
+!
+hardware counter feature qos in
+!
+prompt %H.%D{%H:%M:%S}%P
+alias buffers show int queue length
+alias cc clear counters
+alias qosutil show hardware capacity | egrep -B 4 -i "qos|---"
+alias shcounters show interface %1 counters queue ingress | nz
+alias shqos show qos interface %1
+alias srnz show interfaces counters rates | nz
+
+event-monitor
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model ribd
+!
+queue-monitor length
+queue-monitor length notifying
+!
+queue-monitor length log 60
+!
+sflow sample 1000
+sflow destination 127.0.0.1
+sflow source-interface Management1
+sflow run
+!
+spanning-tree mode mstp
+spanning-tree vlan-id 999,4093-4094 priority 0
+!
+
+vlan 999,4093-4094
+
+
+hardware tcam
+   system profile qos
+!
+monitor connectivity
+   no shutdown
+   !
+   host Google
+      ip 8.8.8.8
+      url http://www.google.com
+   !
+   host HOMENET
+      ip 192.168.1.1
+   !
+   host Spectrum
+      ip 71.79.104.1
+      url https://www.spectrum.com/
+   !
+   host Yahoo
+      ip 72.30.35.9
+      url http://www.yahoo.com
+!
+ip access-list best-effort-map
+   10 permit ip any any dscp 20
+   20 permit ip any any dscp 22
+!
+ip access-list bulk-data-map
+   10 permit ip any any dscp 10
+   20 permit ip any any dscp 12
+!
+ip access-list identified-priority-map
+   10 permit ip any any dscp 16
+   20 permit ip any any dscp 18
+!
+ip access-list ip-video-conf-map
+   10 permit ip any any dscp 32
+   20 permit ip any any dscp 34
+!
+ip access-list ip-voice-map
+   10 permit ip any any dscp 46
+!
+ip access-list ip-voice-signal-map
+   10 permit ip any any dscp 24
+   20 permit ip any any dscp 26
+!
+ip access-list routing-map
+   10 permit ip any any dscp 48
+!
+ip access-list scavenger-map
+   10 permit ip 192.168.0.0/16 any
+   20 permit ip host 30.30.30.100 any
+   30 permit ip host 10.10.10.100 any
+!
+
+qos map cos 0 to traffic-class 0
+qos map cos 1 to traffic-class 1
+qos map dscp 0 1 2 3 4 5 6 7 to traffic-class 0
+qos map dscp 10 12 to traffic-class 1
+qos map dscp 20 22 to traffic-class 3
+qos map dscp 16 to traffic-class 4
+qos map dscp 24 34 to traffic-class 5
+qos map dscp 46 to traffic-class 6
+qos map traffic-class 0 to cos 0
+qos map traffic-class 1 to cos 1
+qos map traffic-class 0 to dscp 0
+qos map traffic-class 1 to dscp 8
+!
+class-map type qos match-any best-effort-map
+   match ip access-group best-effort-map
+!
+class-map type qos match-any bulk-data-map
+   match ip access-group bulk-data-map
+!
+class-map type qos match-any identified-priority-map
+   match ip access-group identified-priority-map
+!
+class-map type qos match-any ip-video-conf-map
+   match ip access-group ip-video-conf-map
+!
+class-map type qos match-any ip-voice-map
+   match ip access-group ip-voice-map
+!
+class-map type qos match-any ip-voice-signal-map
+   match ip access-group ip-voice-signal-map
+!
+class-map type qos match-any routing-map
+   match ip access-group routing-map
+!
+class-map type qos match-any scavenger-map
+   match ip access-group scavenger-map
+!
+policy-map type quality-of-service INGRESS-POLICY-MAP
+   class scavenger-map
+      set traffic-class 0
+      police rate 5 mbps burst-size 2000 bytes
+   !
+   class class-default
+!
+router ospf 1
+   router-id 1.1.1.1
+   bfd default
+   redistribute connected
+   network 10.0.0.0/8 area 0.0.0.0
+   max-lsa 12000
+!
