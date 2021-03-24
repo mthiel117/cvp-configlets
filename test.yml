@@ -7,7 +7,7 @@
 #
   tasks:
 
-  - name: Display Hosts
+  - name: Display Hosts1
     debug:
       #msg: "System {{ hostname }} uses {{ interfaces['Ethernet1']['ip_address'] }}"
       msg: "System {{ hostname }} uses {{ interfaces.Ethernet1.ip_address }} and ASN {{ bgp_asn }}"
