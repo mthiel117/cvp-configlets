@@ -18,3 +18,24 @@ This repo has instructions on how to build a dcoker image and run it as a contai
 ```text
 git clone https://github.com/mthiel117/dockerbuild.git
 ```
+
+## Summary of Steps
+
+1. Update datafiles/devices.csv with devices to create base configlets
+2. Update Device List in host_vars/cvp/device_inventory.yml
+3. Run playbook to create base configlets
+4. Run playbook to update configlets in CVP and attach them to the devices
+
+## Run Playbooks
+
+Create Base Configlets
+
+```text
+ansible-playbook playbooks/create_base_configs.yml
+```
+
+Upload Configlets to CVP and Attach to Device
+
+```text
+ansible-playbook playbooks/update_configlets.yml --tags "update,provison"
+```
