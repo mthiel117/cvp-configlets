@@ -18,12 +18,8 @@ devices_inventory:
     parentContainerName: vEOS
     configlets:
       - DC1_VEOS1-BASE
-      - DC1_VEOS1-INTERFACES
-      - DC1_VEOS1-EXTRAS
   SW1:
     name: SW1
     parentContainerName: TESTING
     configlets:
       - DC1_SW1-BASE
-      - DC1_SW1-INTERFACES
-      - DC1_SW1-EXTRAS
