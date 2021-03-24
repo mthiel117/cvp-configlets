@@ -15,7 +15,6 @@ aaa authorization exec default group RADIUS-SVRS local
 !
 username admin privilege 15 role network-admin secret sha512 $6$VjNhzmCAxU1sUoTD$MLREvtwRBkraoOII322Yo5NTXSrSRpzsAFcq2JcW5GZOtQF4M3hpJZS1DeO0o/zuvY66JffJD0isnW0Tj6fxH/
 username cvpadmin privilege 15 secret sha512 $6$PpXEtQeyPZGN34LR$hZ8n2FOw/6qBLFZPXJunTDwOVN9NIsLmNTlVe7d4QZq82G3iDYxmFoM5umGDqlLZQQTebCQWBrHFbse8fFmse1
-username mthiel privilege 15 role network-admin secret sha512 $6$fdQaIpF/f.I0pmqA$C5na312PZeppMAhigaIyyInm8FNdomUCABC.52b9QiLL1eR2QUWFyiyC8J/NVPqVgLV6ljPSIg6qW60paBY4D0
 !
 clock timezone EST5EDT
 !
