@@ -37,5 +37,5 @@ ansible-playbook playbooks/create_base_configs.yml
 Upload Configlets to CVP and Attach to Device
 
 ```text
-ansible-playbook playbooks/update_configlets.yml --tags "update,provison"
+ansible-playbook playbooks/update_configlets.yml --tags "update,provision"
 ```
